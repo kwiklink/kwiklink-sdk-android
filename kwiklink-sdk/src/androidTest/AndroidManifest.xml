@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Test-only meta-data, merged into the instrumented test APK's
+        manifest alongside src/main's own — gives
+        KwiklinkInitProviderInstrumentedTest a real, installed manifest to
+        read via PackageManager, rather than mocking one. Doesn't affect
+        any real host app: this file is androidTest-scoped, never packaged
+        into a consumer's build.
+    -->
+    <application>
+        <meta-data
+            android:name="io.kwiklink.android.sdk.AutoInit"
+            android:value="true" />
+        <meta-data
+            android:name="io.kwiklink.android.sdk.ApiKey"
+            android:value="instrumented-test-api-key" />
+    </application>
+
+</manifest>

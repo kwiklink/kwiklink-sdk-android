@@ -1,0 +1,21 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+        <!--
+            Opt-in auto-init (io.kwiklink.android.sdk.internal.autoinit.KwiklinkAutoInit) —
+            merged into every host app's manifest regardless, but a no-op
+            unless that app's own manifest sets the
+            io.kwiklink.android.sdk.AutoInit meta-data to true. ${applicationId}
+            in the authority avoids a provider-authority collision between
+            two different apps that both bundle this SDK on the same device
+            (same reasoning as Firebase's own InitProvider).
+        -->
+        <provider
+            android:name=".internal.autoinit.KwiklinkInitProvider"
+            android:authorities="${applicationId}.kwiklinkinitprovider"
+            android:exported="false" />
+    </application>
+
+</manifest>

@@ -1,0 +1,40 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:name=".KwiklinkSampleApp"
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.KwiklinkSample">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!--
+                Real App Link, per docs/android-sdk-plan.md's Phase 1
+                verification: `adb shell am start -a android.intent.action.VIEW
+                -d "https://1kwik.link/<slug>"` and `adb shell pm
+                get-app-links io.kwiklink.sample` to confirm verification.
+
+                android:autoVerify requires this app's applicationId +
+                signing cert SHA256 fingerprint to be registered on the
+                target app's AndroidConfig (dashboard -> app -> settings),
+                so assetlinks.json (HandleWellKnownAssetlinks) lists them —
+                otherwise the OS falls back to the disambiguation dialog
+                instead of opening straight into this activity.
+            -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="1kwik.link" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

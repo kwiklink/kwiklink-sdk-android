@@ -1,0 +1,14 @@
+# Copy this file to local.properties (gitignored) and fill in real values.
+# Never commit local.properties itself — it holds per-machine paths and
+# real API keys.
+
+# Path to your Android SDK install. Android Studio usually writes this for
+# you automatically on first sync; only set it by hand if it doesn't.
+sdk.dir=/path/to/your/Android/Sdk
+
+# sample-app's Kwiklink API key (App Details -> API Keys in the dashboard,
+# for whichever app owns the domain you're testing against). Read into
+# BuildConfig.API_KEY by sample-app/build.gradle.kts — see
+# KwiklinkSampleApp.kt. Without this, resolve/attribution-match calls get a
+# 401 (KwiklinkError.Server).
+KWIKLINK_API_KEY=your-real-api-key-here

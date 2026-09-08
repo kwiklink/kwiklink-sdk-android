@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kwiklink Sample</string>
+    <string name="status_waiting">Waiting for a link…</string>
+    <string name="status_resolving">Resolving…</string>
+    <string name="status_matched">Matched</string>
+    <string name="status_not_matched">No matching link</string>
+    <string name="status_error">Error</string>
+    <string name="empty_state_waiting">Tap a Kwiklink link, or launch the app fresh after an install, to see it resolved here.</string>
+    <string name="empty_state_not_matched">This link doesn\'t exist, has expired, or was already claimed.</string>
+    <string name="label_link_id">Link ID</string>
+</resources>
