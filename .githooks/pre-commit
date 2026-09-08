@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Blocks committing files that look like secrets/keys. Extend the pattern
+# below as new secret-bearing file types show up in this repo.
+set -euo pipefail
+
+pattern='(^|/)(\.env(\..+)?|local\.properties|[^/]*\.jks|[^/]*\.keystore|[^/]*\.pem|[^/]*\.key|[^/]*\.p12|[^/]*\.pfx|[^/]*\.gpg|google-services\.json|GoogleService-Info\.plist|id_rsa[^/]*|id_ed25519[^/]*|[^/]*credentials[^/]*|[^/]*secrets?[^/]*)$'
+
+blocked=()
+while IFS= read -r -d '' f; do
+  case "$f" in
+    *local.properties.example) continue ;;
+  esac
+  if [[ "$f" =~ $pattern ]]; then
+    blocked+=("$f")
+  fi
+done < <(git diff --cached --name-only -z --diff-filter=ACM)
+
+if [ "${#blocked[@]}" -gt 0 ]; then
+  echo "commit blocked: sensitive-looking file(s) staged:" >&2
+  printf '  - %s\n' "${blocked[@]}" >&2
+  echo "remove them from the commit, or use 'git commit --no-verify' if this is a genuine false positive." >&2
+  exit 1
+fi

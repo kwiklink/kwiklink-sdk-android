@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Blocks pushing any commit that introduces a file matching the sensitive
+# patterns below — a safety net for commits made with --no-verify.
+set -euo pipefail
+
+pattern='(^|/)(\.env(\..+)?|local\.properties|[^/]*\.jks|[^/]*\.keystore|[^/]*\.pem|[^/]*\.key|[^/]*\.p12|[^/]*\.pfx|[^/]*\.gpg|google-services\.json|GoogleService-Info\.plist|id_rsa[^/]*|id_ed25519[^/]*|[^/]*credentials[^/]*|[^/]*secrets?[^/]*)$'
+zero='0000000000000000000000000000000000000000'
+empty_tree='4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+
+blocked=()
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue
+  base="$remote_sha"
+  [ "$remote_sha" = "$zero" ] && base="$empty_tree"
+
+  while IFS= read -r -d '' f; do
+    case "$f" in
+      *local.properties.example) continue ;;
+    esac
+    if [[ "$f" =~ $pattern ]]; then
+      blocked+=("$f")
+    fi
+  done < <(git diff --name-only -z --diff-filter=ACM "$base" "$local_sha")
+done
+
+if [ "${#blocked[@]}" -gt 0 ]; then
+  echo "push blocked: sensitive-looking file(s) found in commits being pushed:" >&2
+  printf '  - %s\n' "${blocked[@]}" >&2
+  echo "rewrite history to drop them before pushing, or push with --no-verify if this is a genuine false positive." >&2
+  exit 1
+fi
