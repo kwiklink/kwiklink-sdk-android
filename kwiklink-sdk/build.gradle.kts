@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -5,6 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("signing")
+    id("com.vanniktech.maven.publish")
 }
 
 android {
@@ -68,6 +71,53 @@ if (kwiklinkSigningKeyFile.isPresent && kwiklinkSigningPasswordFile.isPresent) {
             file(kwiklinkSigningKeyFile.get()).readText(),
             file(kwiklinkSigningPasswordFile.get()).readText().trim(),
         )
+    }
+}
+
+// Maven Central coordinates + POM. Upload credentials (mavenCentralUsername/
+// mavenCentralPassword) come from the same ~/.gradle/gradle.properties as the
+// signing config above — publishToMavenCentral() only needs them at publish
+// time, so their absence doesn't block a normal build.
+mavenPublishing {
+    // Maven Central gets exactly one variant — the one that talks to the
+    // real production API host, never the dev-flavored build. This also
+    // registers the android.publishing.singleVariant() config for us.
+    configure(AndroidSingleVariantLibrary(variant = "prodRelease", sourcesJar = true, publishJavadocJar = true))
+
+    // Explicit, not relying on the plugin's default host — this account only
+    // exists on the modern Central Portal (verified via DNS TXT on
+    // kwiklink.io), it has no legacy OSSRH/Nexus staging profile at all.
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+
+    coordinates("io.kwiklink.sdk.android", "kwiklink-sdk", "0.1.0")
+
+    pom {
+        name.set("Kwiklink Android SDK")
+        description.set("Deep link resolution and deferred-install attribution for Android apps using Kwiklink.")
+        url.set("https://github.com/kwiklink/kwiklink-sdk-android")
+
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+
+        developers {
+            developer {
+                id.set("kwiklink")
+                name.set("Kwiklink")
+                email.set("info@kwiklink.io")
+                url.set("https://kwiklink.io")
+            }
+        }
+
+        scm {
+            url.set("https://github.com/kwiklink/kwiklink-sdk-android")
+            connection.set("scm:git:git://github.com/kwiklink/kwiklink-sdk-android.git")
+            developerConnection.set("scm:git:ssh://git@github.com/kwiklink/kwiklink-sdk-android.git")
+        }
     }
 }
 
