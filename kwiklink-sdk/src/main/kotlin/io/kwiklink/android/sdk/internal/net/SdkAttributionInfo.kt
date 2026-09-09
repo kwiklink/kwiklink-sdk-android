@@ -19,14 +19,39 @@ internal object SdkAttributionInfo {
     internal var headers: Map<String, String> = emptyMap()
 
     fun initialize(context: Context) {
+        val metrics = context.resources.displayMetrics
+        val deviceId = DeviceIdProvider.resolve(context)
         headers = buildAttributionHeaders(
-            sdkVersion = BuildConfig.SDK_VERSION,
-            osVersion = Build.VERSION.RELEASE ?: "unknown",
-            apiLevel = Build.VERSION.SDK_INT,
-            deviceModel = Build.MODEL ?: "unknown",
-            deviceManufacturer = Build.MANUFACTURER ?: "unknown",
-            appPackage = context.packageName,
-            appVersion = appVersionName(context),
+            AttributionInfoInput(
+                sdkVersion = BuildConfig.SDK_VERSION,
+                osVersion = Build.VERSION.RELEASE ?: "unknown",
+                apiLevel = Build.VERSION.SDK_INT,
+                deviceModel = Build.MODEL ?: "unknown",
+                deviceManufacturer = Build.MANUFACTURER ?: "unknown",
+                appPackage = context.packageName,
+                appVersion = appVersionName(context),
+                screenWidthPx = metrics.widthPixels,
+                screenHeightPx = metrics.heightPixels,
+                screenDensityDpi = metrics.densityDpi,
+                deviceFingerprint = computeDeviceFingerprint(
+                    manufacturer = Build.MANUFACTURER ?: "unknown",
+                    model = Build.MODEL ?: "unknown",
+                    brand = Build.BRAND ?: "unknown",
+                    device = Build.DEVICE ?: "unknown",
+                    product = Build.PRODUCT ?: "unknown",
+                    board = Build.BOARD ?: "unknown",
+                    hardware = Build.HARDWARE ?: "unknown",
+                    buildFingerprint = Build.FINGERPRINT ?: "unknown",
+                    osVersion = Build.VERSION.RELEASE ?: "unknown",
+                    apiLevel = Build.VERSION.SDK_INT,
+                    screenWidthPx = metrics.widthPixels,
+                    screenHeightPx = metrics.heightPixels,
+                    screenDensityDpi = metrics.densityDpi,
+                    supportedAbis = Build.SUPPORTED_ABIS?.toList() ?: emptyList(),
+                ),
+                deviceId = deviceId.id,
+                deviceIdSource = deviceId.source,
+            ),
         )
     }
 

@@ -13,6 +13,29 @@ internal const val HEADER_DEVICE_MODEL = "X-Kwiklink-Device-Model"
 internal const val HEADER_DEVICE_MANUFACTURER = "X-Kwiklink-Device-Manufacturer"
 internal const val HEADER_APP_PACKAGE = "X-Kwiklink-App-Package"
 internal const val HEADER_APP_VERSION = "X-Kwiklink-App-Version"
+internal const val HEADER_SCREEN_WIDTH = "X-Kwiklink-Screen-Width"
+internal const val HEADER_SCREEN_HEIGHT = "X-Kwiklink-Screen-Height"
+internal const val HEADER_SCREEN_DENSITY = "X-Kwiklink-Screen-Density"
+internal const val HEADER_DEVICE_FINGERPRINT = "X-Kwiklink-Device-Fingerprint"
+internal const val HEADER_DEVICE_ID = "X-Kwiklink-Device-Id"
+internal const val HEADER_DEVICE_ID_SOURCE = "X-Kwiklink-Device-Id-Source"
+
+/** Grouped for [buildAttributionHeaders] — a 14-field flat parameter list stopped being readable. */
+internal data class AttributionInfoInput(
+    val sdkVersion: String,
+    val osVersion: String,
+    val apiLevel: Int,
+    val deviceModel: String,
+    val deviceManufacturer: String,
+    val appPackage: String,
+    val appVersion: String?,
+    val screenWidthPx: Int,
+    val screenHeightPx: Int,
+    val screenDensityDpi: Int,
+    val deviceFingerprint: String,
+    val deviceId: String,
+    val deviceIdSource: String,
+)
 
 /**
  * Pure header-map builder — no `android.os.Build`/`Context` reference, so
@@ -20,25 +43,24 @@ internal const val HEADER_APP_VERSION = "X-Kwiklink-App-Version"
  * of needing Robolectric (this project doesn't have it) or a real device,
  * same reasoning as [io.kwiklink.android.sdk.internal.link.IntentLinkParser.matchesConfiguredDomain]'s
  * extraction. [SdkAttributionInfo.initialize] is the only real caller,
- * feeding it actual `Build.*`/`PackageManager` values.
+ * feeding it actual `Build.*`/`PackageManager`/[computeDeviceFingerprint]/
+ * [DeviceIdProvider] values.
  */
-internal fun buildAttributionHeaders(
-    sdkVersion: String,
-    osVersion: String,
-    apiLevel: Int,
-    deviceModel: String,
-    deviceManufacturer: String,
-    appPackage: String,
-    appVersion: String?,
-): Map<String, String> = buildMap {
-    put(HEADER_SDK_VERSION, sdkVersion)
+internal fun buildAttributionHeaders(input: AttributionInfoInput): Map<String, String> = buildMap {
+    put(HEADER_SDK_VERSION, input.sdkVersion)
     put(HEADER_SDK_PLATFORM, "android")
-    put(HEADER_OS_VERSION, osVersion)
-    put(HEADER_API_LEVEL, apiLevel.toString())
-    put(HEADER_DEVICE_MODEL, deviceModel)
-    put(HEADER_DEVICE_MANUFACTURER, deviceManufacturer)
-    put(HEADER_APP_PACKAGE, appPackage)
-    if (appVersion != null) put(HEADER_APP_VERSION, appVersion)
+    put(HEADER_OS_VERSION, input.osVersion)
+    put(HEADER_API_LEVEL, input.apiLevel.toString())
+    put(HEADER_DEVICE_MODEL, input.deviceModel)
+    put(HEADER_DEVICE_MANUFACTURER, input.deviceManufacturer)
+    put(HEADER_APP_PACKAGE, input.appPackage)
+    if (input.appVersion != null) put(HEADER_APP_VERSION, input.appVersion)
+    put(HEADER_SCREEN_WIDTH, input.screenWidthPx.toString())
+    put(HEADER_SCREEN_HEIGHT, input.screenHeightPx.toString())
+    put(HEADER_SCREEN_DENSITY, input.screenDensityDpi.toString())
+    put(HEADER_DEVICE_FINGERPRINT, input.deviceFingerprint)
+    put(HEADER_DEVICE_ID, input.deviceId)
+    put(HEADER_DEVICE_ID_SOURCE, input.deviceIdSource)
 }
 
 /**
