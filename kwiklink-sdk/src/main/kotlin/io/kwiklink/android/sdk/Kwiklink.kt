@@ -6,6 +6,7 @@ import io.kwiklink.android.sdk.internal.link.DeferredLinkResolver
 import io.kwiklink.android.sdk.internal.link.IntentLinkParser
 import io.kwiklink.android.sdk.internal.link.LinkResolver
 import io.kwiklink.android.sdk.internal.log.KwiklinkLog
+import io.kwiklink.android.sdk.internal.net.SdkAttributionInfo
 import io.kwiklink.android.sdk.internal.referrer.InstallReferrerReader
 import io.kwiklink.android.sdk.model.AttributionResult
 import io.kwiklink.android.sdk.model.KwiklinkError
@@ -27,6 +28,7 @@ object Kwiklink {
         this.appContext = context.applicationContext
         this.config = config
         KwiklinkLog.enabled = config.loggingEnabled
+        SdkAttributionInfo.initialize(context.applicationContext)
         KwiklinkLog.d("Kwiklink SDK initialized")
     }
 

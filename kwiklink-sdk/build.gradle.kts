@@ -10,6 +10,12 @@ plugins {
     id("com.vanniktech.maven.publish")
 }
 
+// Single source of truth for the published version — also exposed to the
+// SDK's own runtime via BuildConfig.SDK_VERSION (see AttributionInterceptor)
+// so what it reports about itself can't drift from what's actually on
+// Maven Central.
+val sdkVersion = "0.1.0"
+
 android {
     namespace = "io.kwiklink.android.sdk"
     compileSdk = 34
@@ -21,6 +27,7 @@ android {
         minSdk = 23
         consumerProguardFiles("consumer-rules.pro")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "SDK_VERSION", "\"$sdkVersion\"")
     }
 
     compileOptions {
@@ -90,7 +97,7 @@ mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
 
-    coordinates("io.kwiklink.sdk.android", "kwiklink-sdk", "0.1.0")
+    coordinates("io.kwiklink.sdk.android", "kwiklink-sdk", sdkVersion)
 
     pom {
         name.set("Kwiklink Android SDK")

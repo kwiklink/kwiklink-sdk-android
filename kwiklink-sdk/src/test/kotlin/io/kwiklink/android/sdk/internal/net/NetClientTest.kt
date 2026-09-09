@@ -27,6 +27,7 @@ class NetClientTest {
     @After
     fun tearDown() {
         server.shutdown()
+        SdkAttributionInfo.headers = emptyMap()
     }
 
     @Test
@@ -149,6 +150,44 @@ class NetClientTest {
         )
 
         assertEquals(TEST_API_KEY, server.takeRequest().getHeader("X-Api-Key"))
+    }
+
+    @Test
+    fun `get carries attribution headers set by Kwiklink init, not just the api key`() = runTest {
+        SdkAttributionInfo.headers = mapOf(
+            HEADER_SDK_VERSION to "0.1.0",
+            HEADER_APP_PACKAGE to "io.kwiklink.sample",
+        )
+        server.enqueue(MockResponse().setResponseCode(200).setBody("""{"linkId":"link-1","linkData":{}}"""))
+
+        client.get(server.url("/v1/links/resolve"), TEST_API_KEY, ResolveLinkResponseDto.serializer())
+
+        val recorded = server.takeRequest()
+        assertEquals(TEST_API_KEY, recorded.getHeader("X-Api-Key"))
+        assertEquals("0.1.0", recorded.getHeader(HEADER_SDK_VERSION))
+        assertEquals("io.kwiklink.sample", recorded.getHeader(HEADER_APP_PACKAGE))
+    }
+
+    @Test
+    fun `post carries attribution headers set by Kwiklink init, not just the api key`() = runTest {
+        SdkAttributionInfo.headers = mapOf(
+            HEADER_SDK_VERSION to "0.1.0",
+            HEADER_APP_PACKAGE to "io.kwiklink.sample",
+        )
+        server.enqueue(MockResponse().setResponseCode(200).setBody("""{"matched":false}"""))
+
+        client.post(
+            server.url("/v1/attribution/match"),
+            TEST_API_KEY,
+            AttributionMatchRequestDto(),
+            AttributionMatchRequestDto.serializer(),
+            AttributionMatchResponseDto.serializer(),
+        )
+
+        val recorded = server.takeRequest()
+        assertEquals(TEST_API_KEY, recorded.getHeader("X-Api-Key"))
+        assertEquals("0.1.0", recorded.getHeader(HEADER_SDK_VERSION))
+        assertEquals("io.kwiklink.sample", recorded.getHeader(HEADER_APP_PACKAGE))
     }
 
     @Test

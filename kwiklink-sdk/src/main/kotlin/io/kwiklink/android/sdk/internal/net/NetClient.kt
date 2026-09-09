@@ -27,7 +27,11 @@ internal sealed class NetResult<out T> {
  * endpoint this SDK calls uses 404 for an ordinary "no match" outcome, not
  * a real error.
  */
-internal class NetClient(private val httpClient: OkHttpClient = OkHttpClient()) {
+internal class NetClient(
+    private val httpClient: OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(AttributionInterceptor())
+        .build(),
+) {
     // encodeDefaults matters for request bodies specifically: kotlinx.serialization
     // omits a property left at its default value by default, and
     // AttributionMatchRequestDto.platform defaults to "android" — dropping
