@@ -7,3 +7,8 @@ build/
 captures/
 .externalNativeBuild/
 .cxx/
+
+# Internal-only doc (dev status/progress/roadmap) — must never reach the
+# public GitHub repo. Still tracked by the private kwiklink-platform
+# (Bitbucket) repo, which has no matching ignore rule for this path.
+README.internal.md

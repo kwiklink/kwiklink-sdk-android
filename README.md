@@ -3,12 +3,10 @@
 Resolves Kwiklink deep links inside an Android host app: warm opens (the
 app is already installed and a verified App Link is tapped) and deferred
 opens (the app is installed *because of* a link tap, and needs to claim
-that link on first launch). See `docs/android-sdk-plan.md` in the repo
-root for the full design and phase history.
+that link on first launch).
 
-**Status**: Phases 0-3 done. Not yet published anywhere — Phase 4 covers
-the JitPack release. Until then, consume it as a local Gradle module
-(`includeBuild`/`project(":kwiklink-sdk")`) or build the `.aar` yourself.
+Consume it as a local Gradle module (`includeBuild`/`project(":kwiklink-sdk")`)
+or build the `.aar` yourself.
 
 ## Requirements
 
