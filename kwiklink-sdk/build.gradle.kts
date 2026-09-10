@@ -14,7 +14,7 @@ plugins {
 // SDK's own runtime via BuildConfig.SDK_VERSION (see AttributionInterceptor)
 // so what it reports about itself can't drift from what's actually on
 // Maven Central.
-val sdkVersion = "0.1.0"
+val sdkVersion = "0.1.1"
 
 android {
     namespace = "io.kwiklink.android.sdk"
@@ -53,8 +53,12 @@ android {
         }
         create("prod") {
             dimension = "environment"
-            // TODO: replace with the real production SDK API host once it exists.
-            buildConfigField("String", "API_HOST", "\"REPLACE_ME_PROD_API_HOST.kwiklink.io\"")
+            // orbit-in1.kwiklink.io is the only SDK API host that actually
+            // exists — it already serves against the real production
+            // database (a deliberate choice, see docs/android-sdk-plan.md),
+            // so there's no separate "real prod host" to point at instead of
+            // what dev already uses. No more placeholder.
+            buildConfigField("String", "API_HOST", "\"orbit-in1.kwiklink.io\"")
         }
     }
 }
