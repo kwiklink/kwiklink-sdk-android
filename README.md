@@ -15,22 +15,18 @@ or build the `.aar` yourself.
 
 ## How the SDK talks to Kwiklink
 
-Every SDK call goes to Kwiklink's own fixed API domain,
-`orbit-in1.kwiklink.io`, under an `/android` path prefix
-(`/android/v1/links/resolve`, `/android/v1/attribution/match`) — never
-directly to your own short-link domain (`your-domain.example`). That
-domain still exists and still serves real redirects/App Links, but the
-SDK only ever sends it as a request *parameter*, not as the host it
-connects to. This isn't something you configure — it's fixed inside the
-SDK.
+Networking is fully managed by the SDK — there's no host or endpoint to
+configure. Your short-link domain (registered below) still serves real
+redirects and App Links on its own; the SDK just uses it as data to look
+up the right link, not as the address it connects to.
 
 ## 1. Register your domain, create an API key
 
-In the Kwiklink dashboard, under your app's settings, add your Android
-`applicationId` and signing cert SHA256 fingerprint to `AndroidConfig`.
-That's what `GET /.well-known/assetlinks.json` on your short-link domain
-serves back — without it, Android's App Links verification silently falls
-back to a disambiguation dialog instead of opening straight into your app.
+In the Kwiklink dashboard, under your app's Android platform settings, add
+your `applicationId` and signing cert SHA256 fingerprint. That's what your
+short-link domain's `/.well-known/assetlinks.json` file serves back —
+without it, Android's App Links verification silently falls back to a
+disambiguation dialog instead of opening straight into your app.
 
 Also create an API key under App Details -> API Keys, and use it as
 `KwiklinkConfig.apiKey` below — every call this SDK makes now requires it
