@@ -5,13 +5,27 @@ app is already installed and a verified App Link is tapped) and deferred
 opens (the app is installed *because of* a link tap, and needs to claim
 that link on first launch).
 
-Consume it as a local Gradle module (`includeBuild`/`project(":kwiklink-sdk")`)
-or build the `.aar` yourself.
-
 ## Requirements
 
 - `minSdk` 23 (the floor Android App Links verification itself supports)
 - Kotlin host app, or Java via the `Callback<T>`-based method overloads
+
+## Installation
+
+Published on Maven Central — add it like any other dependency:
+
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("io.kwiklink.sdk.android:kwiklink-sdk:0.1.2")
+}
+```
+
+(No extra repository to declare — `mavenCentral()` is already in every
+default Android project's `settings.gradle.kts`.) Building from source
+instead — e.g. to test an unreleased change — works the same way as any
+Gradle multi-module checkout: `includeBuild`/`project(":kwiklink-sdk")`, or
+build the `.aar` yourself from this repo.
 
 ## How the SDK talks to Kwiklink
 
@@ -207,6 +221,32 @@ if (intent.data == null && savedInstanceState == null) {
 
 Safe to call more than once — a click already claimed or expired just
 resolves to `matched = false`, it doesn't error.
+
+## Reading the result
+
+Both the warm-open and deferred-open paths return the same `AttributionResult`:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `matched` | `Boolean` | `true` if this device/intent resolved to a real link. Check this first — everything below is only meaningful when it's `true`. |
+| `linkId` | `String?` | The matched link's id. `null` when `matched == false`. |
+| `linkData` | `LinkData?` | The link's custom payload (whatever its creator set via the dashboard/REST API). `null` when `matched == false`. |
+
+`LinkData` wraps a free-form JSON object — read whichever keys your own
+links actually use (reserved keys like `__androidUrl`/`__fallbackUrl` are
+consumed server-side for routing and not usually something you need to
+read yourself):
+
+```kotlin
+result.linkData?.getString("campaign")       // String?
+result.linkData?.getIntOrNull("variant")     // Int?
+result.linkData?.getBooleanOrNull("isPromo") // Boolean?
+result.linkData?.getDoubleOrNull("discount") // Double?
+result.linkData?.keys                        // Set<String> — every key actually present
+```
+
+A missing key or a type mismatch (e.g. `getIntOrNull` on a string value)
+returns `null` rather than throwing.
 
 ## Error handling
 
