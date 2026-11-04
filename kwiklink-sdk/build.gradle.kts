@@ -14,7 +14,7 @@ plugins {
 // SDK's own runtime via BuildConfig.SDK_VERSION (see AttributionInterceptor)
 // so what it reports about itself can't drift from what's actually on
 // Maven Central.
-val sdkVersion = "0.1.1"
+val sdkVersion = "0.1.2"
 
 android {
     namespace = "io.kwiklink.android.sdk"
@@ -106,7 +106,12 @@ mavenPublishing {
     pom {
         name.set("Kwiklink Android SDK")
         description.set("Deep link resolution and deferred-install attribution for Android apps using Kwiklink.")
-        url.set("https://github.com/kwiklink/kwiklink-sdk-android")
+        // This is the link Maven Central's search listing renders as the
+        // clickable "project homepage" — must be genuinely public. The real
+        // source lives in a private Bitbucket monorepo (see scm below), so
+        // this points at the public developer docs instead, not source
+        // control, confirmed reachable (200) as of 2026-11-03.
+        url.set("https://kwiklink.io/docs")
 
         licenses {
             license {
@@ -124,6 +129,13 @@ mavenPublishing {
             }
         }
 
+        // kwiklink/kwiklink-sdk-android (github.com) is the SDK's own public
+        // mirror repo — a real, reachable (200), push-accessible repo, not
+        // the private Bitbucket monorepo this source actually lives in. Used
+        // here (not Bitbucket) because scm metadata should point at
+        // something the public can actually browse; pom.url above points at
+        // the docs site instead since that's the more useful "homepage" link
+        // for someone finding this on Maven Central.
         scm {
             url.set("https://github.com/kwiklink/kwiklink-sdk-android")
             connection.set("scm:git:git://github.com/kwiklink/kwiklink-sdk-android.git")

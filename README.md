@@ -33,11 +33,11 @@ Also create an API key under App Details -> API Keys, and use it as
 (`X-Api-Key` header), and fails with a 401 (`KwiklinkError.Server`)
 without one. Worth being clear-eyed about what this key does and doesn't
 provide: it ships inside your compiled APK, so it's recoverable by anyone
-who decompiles it — the same non-secret "app identifier" role Branch's
-`branch_key` or AppsFlyer's `dev_key` play, not a true secret. What it
-does buy: a stranger without your key can't enumerate links across the
-whole platform for free, and you can rate-limit or revoke per-key if one
-ever does leak.
+who decompiles it — the same non-secret "app identifier" role any
+client-side SDK key plays, not a true secret. What it does buy: a
+stranger without your key can't enumerate links across the whole
+platform for free, and you can rate-limit or revoke per-key if one ever
+does leak.
 
 ## 2. Manifest
 
@@ -128,7 +128,7 @@ own doc comment for why.
 ### Alternative: manifest-based auto-init (no Application code needed)
 
 Instead of the above, you can opt into having the SDK initialize itself —
-the same trick Firebase/Branch use, via a manifest-declared
+a common pattern for attribution SDKs, via a manifest-declared
 `ContentProvider` that runs before your `Application.onCreate()` does:
 
 ```xml
@@ -213,6 +213,28 @@ resolves to `matched = false`, it doesn't error.
 Every throwing call surfaces a `KwiklinkError` subtype: `NotInitialized`,
 `Network`, `Server`, `InvalidResponse`. A normal "no such link" is
 `AttributionResult.matched == false`, not an exception.
+
+## Data this SDK sends
+
+Every API call this SDK makes (warm-open resolve, deferred-open resolve)
+attaches a fixed set of attribution headers, computed once at `Kwiklink.init()`:
+
+- SDK version/platform, OS version, API level, device model/manufacturer,
+  your app's package name and version, and screen width/height/density.
+- A **device fingerprint**: a SHA-256 hash of the above static device/OS/screen
+  attributes plus a few more (brand, board, hardware, build fingerprint,
+  supported ABIs). Used for fraud detection (e.g. spotting device-farm
+  clones), not as a stable per-device identifier — many distinct real
+  devices of the same model/OS/screen share one.
+- A **device id**: `Settings.Secure.ANDROID_ID` when available (sent as-is,
+  not hashed), otherwise a UUID generated and persisted locally on first use.
+
+None of this is a secret value (API key, click id, `linkData`, the raw
+install-referrer string) — see `KwiklinkConfig.loggingEnabled` above for what's
+deliberately kept out of Logcat instead. This data is logged server-side per
+call for attribution/fraud-detection purposes. If you need to complete a Play
+Console Data Safety declaration, this collection (device identifiers, device
+or other IDs) should be accounted for.
 
 ## Testing your integration
 
