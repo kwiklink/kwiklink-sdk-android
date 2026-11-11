@@ -136,8 +136,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** One "LABEL / value" row per remaining [LinkData] key — the reserved
-     * `~`-prefixed keys (fallbackUrl, og_title, ...) render just like any
-     * custom key a link's creator added, just with the `~` stripped from
+     * `_`-prefixed keys (_fallback_url, _og_title, ...) render just like any
+     * custom key a link's creator added, just with the `_` stripped from
      * the label for readability. */
     private fun buildDetailRow(key: String, data: LinkData): View {
         val row = LinearLayout(this).apply {
@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
             ).apply { topMargin = dp(10) }
         }
         val label = TextView(this).apply {
-            text = key.removePrefix("~")
+            text = key.removePrefix("_")
             setTextColor(getColor(R.color.text_muted))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
             isAllCaps = true
