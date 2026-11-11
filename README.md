@@ -233,7 +233,7 @@ Both the warm-open and deferred-open paths return the same `AttributionResult`:
 | `linkData` | `LinkData?` | The link's custom payload (whatever its creator set via the dashboard/REST API). `null` when `matched == false`. |
 
 `LinkData` wraps a free-form JSON object — read whichever keys your own
-links actually use (reserved keys like `__android_url`/`__fallback_url` are
+links actually use (reserved keys like `_android_url`/`_fallback_url` are
 consumed server-side for routing and not usually something you need to
 read yourself):
 

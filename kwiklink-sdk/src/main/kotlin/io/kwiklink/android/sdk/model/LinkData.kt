@@ -9,8 +9,8 @@ import kotlinx.serialization.json.intOrNull
 /**
  * The free-form payload attached to a link (backend: `repo.Link.LinkData`,
  * a `map[string]any`). A handful of `__`-prefixed keys are reserved and
- * interpreted by the redirect engine itself (`__android_url`, `__fallback_url`,
- * `__og_title`, ...) — everything else is whatever the link's creator put
+ * interpreted by the redirect engine itself (`_android_url`, `_fallback_url`,
+ * `_og_title`, ...) — everything else is whatever the link's creator put
  * there, so this wraps the raw JSON rather than a fixed data class.
  */
 class LinkData internal constructor(private val raw: JsonObject) {
